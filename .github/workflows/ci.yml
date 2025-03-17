@@ -1,0 +1,48 @@
+name: build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clonar repository do MS1
+        run: git clone https://github.com/RenanJar/ms1.git
+
+      - name: Configurar Docker Compose
+        run: docker-compose -f docker-compose.test.yml build
+
+      - name: Subir MS1 com Docker Compose
+        run: docker-compose -f docker-compose.test.yml up -d
+
+      - name: Checar se MS1 isOnline
+        run: |
+          echo "Subindo MS1..."
+          until curl -s http://localhost:8080/health; do sleep 5; done
+          echo "Ms1 is online"
+      
+      - name: setup Java 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+
+      - name: setando o cache para o maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: | 
+            ${{ runner.os }}-maven-
+
+      - name: executando mvn clean install
+        run: mvn clean install
+
+      - name: Derrubar containers
+        if: always()
+        run: docker-compose -f docker-compose.test.yml down
