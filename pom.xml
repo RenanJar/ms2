@@ -97,8 +97,7 @@
 								<rule>
 									<element>CLASS</element>
 									<includes>
-										<include>com.recap.ms1.controller.*</include>
-										<include>com.recap.ms1.service.*</include>
+										<include>com.recap.ms2.service.CalcularImpostoStep</include>
 									</includes>
 									<limits>
 										<limit>
