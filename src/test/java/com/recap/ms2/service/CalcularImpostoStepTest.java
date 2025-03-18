@@ -1,20 +1,55 @@
 package com.recap.ms2.service;
 
-import com.recap.ms2.Ms2Application;
+import com.recap.ms2.client.ImpostoCalculatorClient;
+import com.recap.ms2.dto.IcmsRequest;
+import com.recap.ms2.dto.NotaFiscalRequest;
+import lombok.experimental.Accessors;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class CalcularImpostoStepTest {
+
+    @Mock
+    private ImpostoCalculatorClient impostoCalculatorClient;
+
+    @InjectMocks
+    private CalcularImpostoStep calcularImpostoStep;
+
+    private NotaFiscalRequest notaFiscalRequest;
+
+    @BeforeEach
+    void setUp() {
+        notaFiscalRequest = new NotaFiscalRequest("123456789",100.0);
+    }
+
+    @Test
+    void deveRetornarFalseQuandoValorNfforNulo(){
+        notaFiscalRequest.setValorTotalnf(null);
+        boolean processado = calcularImpostoStep.Processar(notaFiscalRequest);
+        assertFalse(processado);
+    }
+
+    @Test
+    void deveRetornarFalseQuandoApiDevolverNull(){
+        when(impostoCalculatorClient.calcularICMS(any(IcmsRequest.class)))
+                .thenReturn(ResponseEntity.ok(null));
+
+        boolean resultado = calcularImpostoStep.Processar(notaFiscalRequest);
+
+        assertFalse(resultado);
+    }
 
 }
