@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ms1:
+    build:
+      context: ./ms1 
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/rest/v1/hello"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
