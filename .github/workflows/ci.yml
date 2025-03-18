@@ -15,6 +15,11 @@ jobs:
       - name: Clonar repository do MS1
         run: git clone https://github.com/RenanJar/ms1.git
 
+      - name: Instalar Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Configurar Docker Compose
         run: docker-compose -f docker-compose.test.yml build
 
